@@ -35,14 +35,17 @@ public class BasicBasicAPITest {
     private HttpResponse response;
     private final CloseableHttpClient client = HttpClientBuilder.create().build();
 
-    private final String userEmail = "phone.boock.test@gmail.com";
-    private final String userPassword = "phone.boock.test";
-    private static String token;
+    private final String userEmail = "newUser1@gmail.com";
+    private final String userPassword = "12345678";
+    private static String token = "eyJhbGciOiJIUzUxMiJ9.eyJ1c2VybmFtZSI6InBheHBpc3RvckBnbWFpbC5jb20iLCJhdXRob3JpdGllcyI6WyJST0xFX1VTRVIiXSwiZXhwIjoxNjAxMDM3MzE5fQ.g6JVYJTJQQ0AsTcitw1WoqANUHdfmT60txKs_SmqGqCH0CmwMvvAa3OBoaq7D35SH_t6BzUiZO6wlyO7rSoXng";
 
     private final String baseUrl = "http://localhost:8080/api";
     private final String contactUrl = baseUrl + "/contact";
     private final String loginUrl = baseUrl + "/user/login";
     private final String registerUrl = baseUrl + "/user";
+    private final String changePassUrl = baseUrl + "/user/auth-password";
+
+
 
     List<ContactJson> contactJsons;
     private StringBuilder stringBuilder;
@@ -87,7 +90,7 @@ public class BasicBasicAPITest {
 
     @Test
     public void test003_testLogin() throws IOException {
-        postRequest = new HttpPost(loginUrl);
+        postRequest = new HttpPost();
         postRequest.setHeader("Content-type", "application/json");
 
         User loginUser = new User(userEmail, userPassword);
@@ -102,42 +105,66 @@ public class BasicBasicAPITest {
     }
 
     @Test
-    public void test004_loopCreateContact() throws IOException {
-        fillContactArray();
-        for (ContactJson contactJson : contactJsons)
-            addContacts(contactJson);
-    }
-
-    private void addContacts(ContactJson contactJson) throws IOException {
-        postRequest = new HttpPost(contactUrl);
-        postRequest.setHeader("Access-Token", token);
+    public void test004_testChangePass() throws IOException {
+        postRequest = new HttpPost();
         postRequest.setHeader("Content-type", "application/json");
 
-        StringEntity entity = new StringEntity(contactJson.toString());
-        postRequest.setEntity(entity);
-        response = client.execute(postRequest);
 
-        assertEquals(response.getStatusLine().getStatusCode(), HttpStatus.SC_OK);
+        User loginUser = new User(userEmail, userPassword);
+
+        StringEntity entity = new StringEntity(loginUser.toJson());
+        String newUserPassword = "12345678";
+        putRequest = new HttpPut(changePassUrl);
+        putRequest.setHeader("Content-type", "application/json");
+        putRequest.setHeader("Access-Token", token);
+
+        StringEntity entity1 = new StringEntity("{\"password\"" + ":" + "\"" + newUserPassword + "\"}");
+
+        putRequest.setEntity(entity1);
+        response = client.execute(putRequest);
+
+        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+
+
     }
 
-    private void fillContactArray() {
-        contactJsons = Arrays.asList(
-                new ContactJson("Eduard", "Schmidt", null),
-                new ContactJson("Max", "Mustermann", null),
-                new ContactJson("Anna", "Klein", null),
-                new ContactJson("Maria", "Bauer", null),
-                new ContactJson("Martin", "Kenner", null),
-                new ContactJson("Denis", "Fuhrmann", null),
-                new ContactJson("Vasilij", "Popov", null),
-                new ContactJson("Swetlana", "Berger", null),
-                new ContactJson("Peter", "Schmidt", null),
-                new ContactJson("Daniela", "Lutzenberger", null),
-                new ContactJson("Emily-Sofie", "Smith", null),
-                new ContactJson("Isabel", "Tailor", null),
-                new ContactJson("Markus", "Taylor", null),
-                new ContactJson("Florian", "Thomas", null),
-                new ContactJson("Mercedes", "Benz", null),
-                new ContactJson("Karl", "Mueller", null)
-        );
-    }
+//    @Test
+//    public void test004_loopCreateContact() throws IOException {
+//        fillContactArray();
+//        for (ContactJson contactJson : contactJsons)
+//            addContacts(contactJson);
+//    }
+
+//    private void addContacts(ContactJson contactJson) throws IOException {
+//        postRequest = new HttpPost(contactUrl);
+//        postRequest.setHeader("Access-Token", token);
+//        postRequest.setHeader("Content-type", "application/json");
+//
+//        StringEntity entity = new StringEntity(contactJson.toString());
+//        postRequest.setEntity(entity);
+//        response = client.execute(postRequest);
+//
+//        assertEquals(response.getStatusLine().getStatusCode(), HttpStatus.SC_OK);
+//    }
+//
+//    private void fillContactArray() {
+//        contactJsons = Arrays.asList(
+//                new ContactJson("Eduard", "Schmidt", null),
+//                new ContactJson("Max", "Mustermann", null),
+//                new ContactJson("Anna", "Klein", null),
+//                new ContactJson("Maria", "Bauer", null),
+//                new ContactJson("Martin", "Kenner", null),
+//                new ContactJson("Denis", "Fuhrmann", null),
+//                new ContactJson("Vasilij", "Popov", null),
+//                new ContactJson("Swetlana", "Berger", null),
+//                new ContactJson("Peter", "Schmidt", null),
+//                new ContactJson("Daniela", "Lutzenberger", null),
+//                new ContactJson("Emily-Sofie", "Smith", null),
+//                new ContactJson("Isabel", "Tailor", null),
+//                new ContactJson("Markus", "Taylor", null),
+//                new ContactJson("Florian", "Thomas", null),
+//                new ContactJson("Mercedes", "Benz", null),
+//                new ContactJson("Karl", "Mueller", null)
+//        );
+//    }
 }
