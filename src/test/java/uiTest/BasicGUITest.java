@@ -1,12 +1,10 @@
 package uiTest;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.NoSuchElementException;
-import uiTest.pages.LoginPage;
-import uiTest.pages.MainPage;
-import uiTest.pages.RegistrationConfirmationPage;
-import uiTest.pages.RegistrationPage;
+import uiTest.pages.*;
 import uiTest.utils.FunctionalTest;
 
 
@@ -18,11 +16,12 @@ public class BasicGUITest extends FunctionalTest {
     private final LoginPage loginPage = new LoginPage(driver);
     private MainPage mainPage;
 
-    private final String userName = "qatest.taran02@gmail.com";
+    private final String userName = "paxpistor@gmail.com";
     private final String userRandomName = System.currentTimeMillis() + "@mail.com";
-    private final String password = "01234567890";
+    private final String password = "12345678";
     private final String baseURL = "http://localhost:4200/";
     private final String signUpUrl = "http://localhost:4200/user/registration";
+    private final String loginURL = "http://localhost:4200/user/login";
 
     @Before
     public void init() {
@@ -106,5 +105,62 @@ public class BasicGUITest extends FunctionalTest {
 
         assertEquals(false, registrationPage.isBtnSubmitDisabled());
         registrationPage.emailConfirmErrorGetText();
+    }
+
+    @Test
+    public void testLogIn() throws InterruptedException {
+        driver.get(loginURL);
+
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.fillLoginForm(userName, password);
+
+        assertEquals(false, loginPage.isLoginBtnDisabled());
+
+        HomePage homePage = loginPage.clickLoginButton();
+        Thread.sleep(3000);
+
+        assertEquals("http://localhost:4200/contacts", driver.getCurrentUrl());
+    }
+
+    @Test
+    public void testLogInEmailNotEquals(){
+        driver.get(loginURL);
+
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.fillLoginForm(userRandomName, password);
+
+        assertEquals(false, loginPage.isLoginBtnDisabled());
+        HomePage homePage = loginPage.clickLoginButton();
+        assertEquals("Please check your activation or Login + Password combination",loginPage.emailGetErrorText());
+       }
+
+    @Test
+    public void testLogInPasswordNotEquals(){
+        driver.get(loginURL);
+
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.fillLoginForm(userName, "asdfghjk");
+
+        assertEquals(false, loginPage.isLoginBtnDisabled());
+        HomePage homePage = loginPage.clickLoginButton();
+        assertEquals("Please check your activation or Login + Password combination",loginPage.emailGetErrorText());
+    }
+
+    @Test
+    public void testChangePassword() {
+        driver.get(loginURL);
+
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.fillLoginForm(userName, password);
+
+        assertEquals(false, loginPage.isLoginBtnDisabled());
+        HomePage homePage = loginPage.clickLoginButton();
+
+        ChangePassword changePassword = new ChangePassword(driver);
+
+        changePassword.fillPasswordField("qwertyui");
+        changePassword.fillConfirmPasswordField("asdfghjkl");
+
+        assertEquals("Passwords do not match.",changePassword.passwordConfirmErrorMessageText());
     }
 }

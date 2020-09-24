@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 
 public class FunctionalTest {
-    private static final String PATH_TO_DRIVER = "C:\\opt\\chromedriver.exe";
+    private static final String PATH_TO_DRIVER = "C:\\Users\\paxpi\\Downloads\\chromedriver.exe";
 
     protected static WebDriver driver;
     protected final Logger logger = LogManager.getLogger(getClass());
@@ -47,10 +47,10 @@ public class FunctionalTest {
         driver.manage().deleteAllCookies();
     }
 
-    @AfterClass
-    public static void tearDown() {
-        driver.quit();
-    }
+//    @AfterClass
+//    public static void tearDown() {
+//        driver.quit();
+//    }
 
     private void takeScreenShot(String methodName) {
         File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
