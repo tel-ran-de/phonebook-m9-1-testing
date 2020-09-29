@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestRule;
@@ -13,11 +14,20 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import uiTest.pages.HomePage;
+import uiTest.pages.LoginPage;
+import uiTest.pages.MainPage;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.assertEquals;
+import static uiTest.BasicGUITest.loginPage;
+import static uiTest.ConstansName.password;
+import static uiTest.ConstansName.userName;
+import static uiTest.ConstansURL.baseURL;
 
 
 public class FunctionalTest {
@@ -25,6 +35,9 @@ public class FunctionalTest {
 
     protected static WebDriver driver;
     protected final Logger logger = LogManager.getLogger(getClass());
+
+    private final LoginPage loginPage = new LoginPage(driver);
+    public static MainPage mainPage;
 
     @Rule
     public final TestRule watchman = new TestWatcher() {
@@ -47,10 +60,24 @@ public class FunctionalTest {
         driver.manage().deleteAllCookies();
     }
 
+    @Before
+    public void init() {
+        driver.get(baseURL);
+        mainPage = loginPage.login(userName, password);
+    }
+
 //    @AfterClass
 //    public static void tearDown() {
 //        driver.quit();
 //    }
+
+    public void logIn(){
+        LoginPage loginPage = new LoginPage(driver);
+        loginPage.fillLoginForm(userName, password);
+
+        assertEquals(false, loginPage.isLoginBtnDisabled());
+        HomePage homePage = loginPage.clickLoginButton();
+    }
 
     private void takeScreenShot(String methodName) {
         File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
